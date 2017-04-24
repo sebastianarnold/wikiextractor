@@ -160,6 +160,10 @@ options = SimpleNamespace(
     toHTML = False,
 
     ##
+    # Whether to keep headers
+    keepHeaders = True,
+
+    ##
     # Whether to write json instead of the xml-like default output format
     write_json = False,
     
@@ -584,7 +588,7 @@ class Extractor(object):
         logging.info('%s\t%s', self.id, self.title)
         
         # Separate header from text with a newline.
-        if options.toHTML:
+        if options.toHTML or options.keepHeaders:
             title_str = '<h1>' + self.title + '</h1>'
         else:
             title_str = self.title + '\n'
@@ -2536,7 +2540,7 @@ def compact(text):
         if m:
             title = m.group(2)
             lev = len(m.group(1)) # header level
-            if options.toHTML:
+            if options.toHTML or options.keepHeaders:
                 page.append("<h%d>%s</h%d>" % (lev, title, lev))
             if title and title[-1] not in '!?':
                 title += '.'    # terminate sentence.
@@ -2619,7 +2623,7 @@ def compact(text):
         elif (line[0] == '(' and line[-1] == ')') or line.strip('.-') == '':
             continue
         elif len(headers):
-            if options.keepSections:
+            if options.keepSections and not options.keepHeaders:
                 items = sorted(headers.items())
                 for i, v in items:
                     page.append(v)
@@ -3101,6 +3105,8 @@ def main():
     groupP = parser.add_argument_group('Processing')
     groupP.add_argument("--html", action="store_true",
                         help="produce HTML output, subsumes --links")
+    groupP.add_argument("--headers", action="store_true",
+                        help="produce headers as HTML tags")
     groupP.add_argument("-l", "--links", action="store_true",
                         help="preserve links")
     groupP.add_argument("-s", "--sections", action="store_true",
@@ -3146,6 +3152,7 @@ def main():
     options.keepSections = args.sections
     options.keepLists = args.lists
     options.toHTML = args.html
+    options.keepHeaders = args.headers
     options.write_json = args.json
     options.print_revision = args.revision
     options.min_text_length = args.min_text_length
