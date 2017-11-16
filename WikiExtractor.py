@@ -148,6 +148,10 @@ options = SimpleNamespace(
     keepLinks = False,
 
     ##
+    # Whether to preserve external links in output
+    keepExternalLinks = False,
+
+    ##
     # Whether to preserve section titles
     keepSections = True,
 
@@ -2482,14 +2486,14 @@ def replaceExternalLinks(text):
 
 def makeExternalLink(url, anchor):
     """Function applied to wikiLinks"""
-    if options.keepLinks:
+    if options.keepExternalLinks:
         return '<a href="%s">%s</a>' % (quote(url.encode('utf-8')), anchor)
     else:
         return anchor
 
 
 def makeExternalImage(url, alt=''):
-    if options.keepLinks:
+    if options.keepExternalLinks:
         return '<img src="%s" alt="%s">' % (url, alt)
     else:
         return alt
@@ -2596,16 +2600,18 @@ def compact(text):
             line = line[i:].strip()
             if line:  # FIXME: n is '"'
                 if options.keepLists:
-                    if options.keepSections:
+                    #if options.keepSections:
                         # emit open sections
-                        items = sorted(headers.items())
-                        for _, v in items:
-                            page.append(v)
-                    headers.clear()
-                    # use item count for #-lines
-                    listCount[i - 1] += 1
-                    bullet = '%d. ' % listCount[i - 1] if n == '#' else '- '
-                    page.append('{0:{1}s}'.format(bullet, len(listLevel)) + line)
+                        #items = sorted(headers.items())
+                        #for _, v in items:
+                            #page.append(v)
+                    # if there are open sections, this is a list-only section. we skip!
+                    if options.keepSections and not headers.items():
+                        headers.clear()
+                        # use item count for #-lines
+                        listCount[i - 1] += 1
+                        bullet = '%d. ' % listCount[i - 1] if n == '#' else '- '
+                        page.append('{0:{1}s}'.format(bullet, len(listLevel)) + line)
                 elif options.toHTML:
                     page.append(listItem[n] % line)
         elif len(listLevel):
@@ -3109,6 +3115,8 @@ def main():
                         help="produce headers as HTML tags")
     groupP.add_argument("-l", "--links", action="store_true",
                         help="preserve links")
+    groupP.add_argument("-e", "--extlinks", action="store_true",
+                        help="preserve external links")
     groupP.add_argument("-s", "--sections", action="store_true",
                         help="preserve sections")
     groupP.add_argument("--lists", action="store_true",
@@ -3149,6 +3157,7 @@ def main():
     args = parser.parse_args()
 
     options.keepLinks = args.links
+    options.keepExternalLinks = args.extlinks
     options.keepSections = args.sections
     options.keepLists = args.lists
     options.toHTML = args.html
