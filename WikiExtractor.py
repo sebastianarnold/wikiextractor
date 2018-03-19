@@ -2402,7 +2402,7 @@ def replaceInternalLinks(text):
 def makeInternalLink(title, label):
     colon = title.find(':')
     if colon > 0 and title[:colon] not in options.acceptedNamespaces:
-        return ''
+        return label
     if colon == 0:
         # drop also :File:
         colon2 = title.find(':', colon + 1)
