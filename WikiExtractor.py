@@ -710,7 +710,7 @@ class Extractor(object):
             text = bold_italic.sub(r'\1', text)
             text = bold.sub(r'\1', text)
             text = italic_quote.sub(r'"\1"', text)
-            text = italic.sub(r'"\1"', text)
+            text = italic.sub(r'\1', text)
             text = quote_quote.sub(r'"\1"', text)
         # residuals of unbalanced quotes
         text = text.replace("'''", '').replace("''", '"')
