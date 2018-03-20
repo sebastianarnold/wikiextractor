@@ -2398,15 +2398,63 @@ def replaceInternalLinks(text):
 #     }
 #     return holders
 
+# from: https://meta.wikimedia.org/wiki/Special:Interwiki
+
+interwikiPrefixes = [
+        'acronym', 'advisory', 'advogato', 'aew', 'appropedia', 'aquariumwiki', 'arborwiki', 'arxiv', 'atmwiki', 'b', 'baden', 'battlestarwiki', 'bcnbio', 'beacha', 'betawiki', 
+        'betawikiversity', 'bibcode', 'bibliowiki', 'bluwiki', 'blw', 'botwiki', 'boxrec', 'brickwiki', 'bugzilla', 'bulba', 'c', 'c2', 'c2find', 'cache', 'cellwiki', 'centralwikia', 
+        'chapter', 'chej', 'choralwiki', 'citizendium', 'ckwiss', 'cmn', 'comixpedia', 'commons', 'communityscheme', 'communitywiki', 'comune', 'creativecommons', 'creativecommonswiki',
+        'cxej', 'cz', 'd', 'dbdump', 'dcc', 'dcdatabase', 'dcma', 'delicious', 'devmo', 'dict', 'dictionary', 'disinfopedia', 'distributedproofreaders', 'distributedproofreadersca', 
+        'dk', 'dmoz', 'dmozs', 'doi', 'donate', 'doom_wiki', 'download', 'dpd', 'drae', 'dreamhost', 'drumcorpswiki', 'dwjwiki', 'ecoreality', 'ecxei', 'elibre', 'emacswiki', 'encyc', 
+        'energiewiki', 'englyphwiki', 'enkol', 'eokulturcentro', 'epo', 'esolang', 'etherpad', 'ethnologue', 'ethnologuefamily', 'evowiki', 'exotica', 'eĉei', 'fanimutationwiki', 'fedora', 
+        'finalfantasy', 'finnix', 'flickrphoto', 'flickruser', 'floralwiki', 'foldoc', 'forthfreak', 'foundation', 'foxwiki', 'freebio', 'freebsdman', 'freeculturewiki', 'freedomdefined', 
+        'freefeel', 'freekiwiki', 'freenode', 'freesoft', 'ganfyd', 'gardenology', 'gausswiki', 'gentoo', 'genwiki', 'gerrit', 'git', 'globalvoices', 'glossarwiki', 'glossarywiki', 
+        'google', 'googledefine', 'googlegroups', 'guildwarswiki', 'guildwiki', 'gutenberg', 'gutenbergwiki', 'h2wiki', 'hackerspaces', 'hammondwiki', 'hdl', 'heraldik', 'heroeswiki', 
+        'horizonlabs', 'hrfwiki', 'hrwiki', 'hupwiki', 'iarchive', 'imdbcharacter', 'imdbcompany', 'imdbname', 'imdbtitle', 'incubator', 'infosecpedia', 'infosphere', 'irc', 'ircrc', 
+        'iso639-3', 'issn', 'iuridictum', 'jaglyphwiki', 'javanet', 'javapedia', 'jefo', 'jerseydatabase', 'jira', 'jp', 'jspwiki', 'jstor', 'kamelo', 'karlsruhe', 'kinowiki', 'kmwiki', 
+        'komicawiki', 'kontuwiki', 'koslarwiki', 'labsconsole', 'libreplanet', 'linguistlist', 'linuxwiki', 'linuxwikide', 'liswiki', 'literateprograms', 'livepedia', 'localwiki', 'lojban', 
+        'lostpedia', 'lqwiki', 'luxo', 'm', 'mail', 'mailarchive', 'mariowiki', 'marveldatabase', 'meatball', 'mediawikiwiki', 'mediazilla', 'memoryalpha', 'meta', 'metawiki', 
+        'metawikimedia', 'metawikipedia', 'metawikisearch', 'mineralienatlas', 'minnan', 'moinmoin', 'monstropedia', 'mosapedia', 'mozcom', 'mozillawiki', 'mozillazinekb', 'musicbrainz', 
+        'mw', 'mwod', 'mwot', 'n', 'nara', 'nkcells', 'nosmoke', 'nost', 'nostalgia', 'oeis', 'oldwikisource', 'olpc', 'onelook', 'openlibrary', 'openstreetmap', 'openwetware', 
+        'opera7wiki', 'organicdesign', 'orthodoxwiki', 'osmwiki', 'otrs', 'otrswiki', 'ourmedia', 'outreach', 'outreachwiki', 'owasp', 'panawiki', 'patwiki', 'personaltelco', 'petscan', 
+        'phab', 'phabricator', 'phpwiki', 'phwiki', 'planetmath', 'pmeg', 'pmid', 'pokewiki', 'pokéwiki', 'policy', 'proofwiki', 'psycle', 'pyrev', 'pythoninfo', 'pythonwiki', 'pywiki', 
+        'q', 'quality', 'quarry', 'rcirc', 'reuterswiki', 'rev', 'revo', 'rfc', 'rheinneckar', 'robowiki', 'rodovid', 'rowiki', 'rt', 'rtfm', 's', 's23wiki', 'scholar', 'schoolswp', 
+        'scores', 'scoutwiki', 'scramble', 'seapig', 'seattlewiki', 'securewikidc', 'semantic-mw', 'senseislibrary', 'sep11', 'sharemap', 'silcode', 'slashdot', 'slwiki', 'sourceforge', 
+        'spcom', 'species', 'squeak', 'stats', 'stewardry', 'strategy', 'strategywiki', 'sulutil', 'svn', 'swinbrain', 'swtrain', 'tabwiki', 'tclerswiki', 'technorati', 'tenwiki', 
+        'test2wiki', 'testwiki', 'testwikidata', 'tfwiki', 'thelemapedia', 'theopedia', 'thinkwiki', 'ticket', 'tmbw', 'tmnet', 'tmwiki', 'toolforge', 'toollabs', 'tools', 'translatewiki', 
+        'tswiki', 'tviv', 'tvtropes', 'twiki', 'tyvawiki', 'uncyclopedia', 'unihan', 'unreal', 'urbandict', 'usability', 'usej', 'usemod', 'utrs', 'v', 'viaf', 'vikidia', 'vkol', 'vlos', 
+        'voipinfo', 'votewiki', 'voy', 'w', 'werelate', 'wg', 'wikia', 'wikiapiary', 'wikiasite', 'wikibooks', 'wikichristian', 'wikicities', 'wikicity', 'wikiconference', 'wikidata', 
+        'wikif1', 'wikifur', 'wikihow', 'wikiindex', 'wikilemon', 'wikilivres', 'wikilivresru', 'wikimac-de', 'wikimedia', 'wikinews', 'wikinfo', 'wikinvest', 'wikiotics', 'wikipapers', 
+        'wikipedia', 'wikipediawikipedia', 'wikiquote', 'wikiskripta', 'wikisophia', 'wikisource', 'wikispecies', 'wikispot', 'wikitech', 'wikiti', 'wikitree', 'wikiversity', 'wikivoyage', 
+        'wikiwikiweb', 'wikt', 'wiktionary', 'wipipedia', 'wlug', 'wm2005', 'wm2006', 'wm2007', 'wm2008', 'wm2009', 'wm2010', 'wm2011', 'wm2012', 'wm2013', 'wm2014', 'wm2015', 'wm2016', 
+        'wm2017', 'wm2018', 'wmam', 'wmania', 'wmar', 'wmat', 'wmau', 'wmbd', 'wmbe', 'wmbr', 'wmca', 'wmch', 'wmcl', 'wmcn', 'wmco', 'wmcz', 'wmdc', 'wmde', 'wmdeblog', 'wmdk', 'wmec', 
+        'wmee', 'wmes', 'wmet', 'wmf', 'wmfblog', 'wmfi', 'wmfr', 'wmhk', 'wmhu', 'wmid', 'wmil', 'wmin', 'wmit', 'wmke', 'wmmk', 'wmmx', 'wmnl', 'wmno', 'wmnyc', 'wmpa-us', 'wmph', 'wmpl', 
+        'wmpt', 'wmrs', 'wmru', 'wmse', 'wmsk', 'wmteam', 'wmtr', 'wmtw', 'wmua', 'wmuk', 'wmve', 'wmza', 'wookieepedia', 'wowwiki', 'wqy', 'wurmpedia', 'zh-cfr', 'zrhwiki', 'zum', 'zwiki', 
+        'ĉej', 'aa', 'ab', 'ace', 'ady', 'af', 'ak', 'als', 'am', 'an', 'ang', 'ar', 'arc', 'arz', 'as', 'ast', 'atj', 'av', 'ay', 'az', 'azb', 'ba', 'bar', 'bat-smg', 'bcl', 'be', 
+        'be-x-old', 'bg', 'bh', 'bi', 'bjn', 'bm', 'bn', 'bo', 'bpy', 'br', 'bs', 'bug', 'bxr', 'ca', 'cbk-zam', 'cdo', 'ce', 'ceb', 'ch', 'cho', 'chr', 'chy', 'ckb', 'co', 'cr', 'crh', 
+        'cs', 'csb', 'cu', 'cv', 'cy', 'da', 'de', 'din', 'diq', 'dsb', 'dty', 'dv', 'dz', 'ee', 'el', 'eml', 'en', 'eo', 'es', 'et', 'eu', 'ext', 'fa', 'ff', 'fi', 'fiu-vro', 'fj', 'fo', 
+        'fr', 'frp', 'frr', 'fur', 'fy', 'ga', 'gag', 'gan', 'gd', 'gl', 'glk', 'gn', 'gom', 'got', 'gu', 'gv', 'ha', 'hak', 'haw', 'he', 'hi', 'hif', 'ho', 'hr', 'hsb', 'ht', 'hu', 'hy', 
+        'hz', 'ia', 'id', 'ie', 'ig', 'ii', 'ik', 'ilo', 'io', 'is', 'it', 'iu', 'ja', 'jam', 'jbo', 'jv', 'ka', 'kaa', 'kab', 'kbd', 'kbp', 'kg', 'ki', 'kj', 'kk', 'kl', 'km', 'kn', 'ko', 
+        'koi', 'kr', 'krc', 'ks', 'ksh', 'ku', 'kv', 'kw', 'ky', 'la', 'lad', 'lb', 'lbe', 'lez', 'lg', 'li', 'lij', 'lmo', 'ln', 'lo', 'lrc', 'lt', 'ltg', 'lv', 'mai', 'map-bms', 'mdf', 
+        'mg', 'mh', 'mhr', 'mi', 'min', 'mk', 'ml', 'mn', 'mo', 'mr', 'mrj', 'ms', 'mt', 'mus', 'mwl', 'my', 'myv', 'mzn', 'na', 'nah', 'nap', 'nds', 'nds-nl', 'ne', 'new', 'ng', 'nl', 
+        'nn', 'no', 'nov', 'nrm', 'nso', 'nv', 'ny', 'oc', 'olo', 'om', 'or', 'os', 'pa', 'pag', 'pam', 'pap', 'pcd', 'pdc', 'pfl', 'pi', 'pih', 'pl', 'pms', 'pnt', 'pnb', 'ps', 'pt', 'qu', 
+        'rm', 'rmy', 'rn', 'ro', 'roa-rup', 'roa-tara', 'ru', 'rue', 'rw', 'sa', 'sah', 'sc', 'scn', 'sco', 'sd', 'se', 'sg', 'sh', 'si', 'simple', 'sk', 'sl', 'sm', 'sn', 'so', 'sq', 'sr', 
+        'srn', 'ss', 'st', 'stq', 'su', 'sv', 'sw', 'szl', 'ta', 'tcy', 'te', 'tet', 'tg', 'th', 'ti', 'tk', 'tl', 'tn', 'to', 'tpi', 'tr', 'ts', 'tt', 'tum', 'tw', 'ty', 'tyv', 'udm', 
+        'ug', 'uk', 'ur', 'uz', 've', 'vec', 'vep', 'vi', 'vls', 'vo', 'wa', 'war', 'wo', 'wuu', 'xal', 'xh', 'xmf', 'yi', 'yo', 'za', 'zea', 'zh', 'zh-classical', 'zh-min-nan', 'zh-yue', 
+        'zu', 'nb', 'zh-cn', 'zh-tw', 'nan', 'vro', 'lzh', 'yue', 'rup', 'gsw', 'be-tarask', 'sgs', 'egl'
+]
 
 def makeInternalLink(title, label):
     colon = title.find(':')
-    if colon > 0 and title[:colon] not in options.acceptedNamespaces:
-        return label
+    if colon > 0 and title[:colon].lower() not in options.acceptedNamespaces:
+        if title[:colon].lower() in interwikiPrefixes:
+            return label
+        else:
+            return ''
     if colon == 0:
         # drop also :File:
         colon2 = title.find(':', colon + 1)
-        if colon2 > 1 and title[colon + 1:colon2] not in options.acceptedNamespaces:
+        if colon2 > 1 and title[colon + 1:colon2].lower() not in options.acceptedNamespaces:
             return ''
     if options.keepLinks:
         return '<a href="%s">%s</a>' % (quote(title.encode('utf-8')), label)
