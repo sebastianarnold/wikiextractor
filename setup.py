@@ -1,21 +1,41 @@
-from setuptools import setup
+from setuptools import setup, find_packages
+import re
 
-def readme():
-    with open('README.md') as f:
-        return f.read()
+from wikiextractor.WikiExtractor import version
+
+
+def get_version(version):
+    if re.match(r'^\d+\.\d+$', version):
+        return version + '.0'
+    return version
+
+with open("README.md", "r") as fh:
+    long_description = fh.read()
 
 setup(
     name='wikiextractor',
-
-    description='A script that extracts and cleans text from a Wikipedia'
-                'database dump',
+    version=get_version(version),
     author='Giuseppe Attardi',
-    author_email='attardi@di.unipi.it',
-    version='2.69',
-
-    url='https://github.com/attardi/wikiextractor',
-
-    license="GPL 3.0",
-    keywords=['text', 'nlp'],
-    scripts=['WikiExtractor.py']
+    author_email='attardi@gmail.com',
+    description='A tool for extracting plain text from Wikipedia dumps',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
+    license='GNU Affero General Public License',
+    install_requires=[],
+    url="https://github.com/attardi/wikiextractor",
+    packages=find_packages(include=["wikiextractor"]),
+    classifiers=[
+        'Development Status :: 5 - Production/Stable',
+        'Intended Audience :: Developers',
+        'Topic :: Text Processing :: Linguistic',
+        'License :: OSI Approved :: GNU Affero General Public License v3 or later (AGPLv3+)',
+        'Programming Language :: Python :: 3'
+     ],
+    entry_points={
+        "console_scripts": [
+            "wikiextractor = wikiextractor.Wikiextractor:main",
+            "extractPage = wikiextractor.extractPage:main",
+            ]
+        },
+    python_requires='>=3.6',
 )
